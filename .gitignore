@@ -19,6 +19,7 @@ Desktop.ini
 # Node / Dependencies / Build
 node_modules/
 dist/
+.env
 
 # SQLite Database
 *.sqlite

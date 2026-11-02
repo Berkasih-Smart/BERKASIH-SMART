@@ -41,6 +41,7 @@ export function renderSystem(container) {
       <button class="tab-item" data-tab="tab-data-health">Data Health Monitor (Integritas)</button>
       <button class="tab-item" data-tab="tab-users-roles">Pengguna & Peran (RBAC)</button>
       <button class="tab-item" data-tab="tab-audit-logs">Audit Log (Rekam Jejak)</button>
+      ${auth.isSuperAdmin() ? '<button class="tab-item" data-tab="tab-system-deploy">Pembaruan & Deployment</button>' : ''}
     </div>
 
     <!-- 1. Master Data & Prices Tab (Section 34) -->
@@ -225,6 +226,49 @@ export function renderSystem(container) {
         </div>
       </div>
     </div>
+
+    <!-- 5. Deployment / Update Tab (Super Admin Only) -->
+    ${auth.isSuperAdmin() ? `
+      <div id="tab-system-deploy" class="tab-content-panel" style="display: none;">
+        <div class="card" style="margin-bottom: var(--space-6);">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div class="card-title">Pembaruan Sistem Otomatis (aaPanel Webhook)</div>
+              <div style="font-size: 0.75rem; color: #6B7280;">
+                Memicu deployment versi terbaru langsung dari branch <code>main</code> di GitHub ke server produksi aaPanel.
+              </div>
+            </div>
+            <span class="badge badge-healthy">Akses Khusus Super Admin</span>
+          </div>
+
+          <div class="card-body">
+            <div style="background-color: #F8FAF8; border: 1px solid var(--color-border); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+              <h4 style="font-size: 0.88rem; font-weight: 700; color: #14532D; margin-bottom: 8px;">Tahapan yang Akan Dijalankan Server:</h4>
+              <ol style="margin: 0; padding-left: 20px; font-size: 0.8rem; color: #374151; line-height: 1.6;">
+                <li><strong>Git Pull</strong>: Mengambil commit terbaru dari branch <code>main</code> di GitHub.</li>
+                <li><strong>Dependencies</strong>: Memeriksa dan memperbarui paket npm jika ada dependensi baru.</li>
+                <li><strong>Build TypeScript</strong>: Mengompilasi kode NestJS ke direktori <code>dist/</code>.</li>
+                <li><strong>Restart Node Process</strong>: Me-reload aplikasi secara otomatis di aaPanel.</li>
+              </ol>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 8px;">
+              <div style="font-size: 0.75rem; color: #6B7280;">
+                <div>Keamanan: Endpoint dilindungi JWT & dicatat permanen dalam audit log.</div>
+                <div>Perkiraan waktu proses: <strong>15 - 30 detik</strong>.</div>
+              </div>
+              <button class="btn btn-primary" id="btn-trigger-deploy" style="display: flex; align-items: center; gap: 8px; font-weight: 700;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                Perbarui Aplikasi Sekarang
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    ` : ''}
   `;
 
   // Attach System Tabs
@@ -242,6 +286,14 @@ export function renderSystem(container) {
       if (targetPanel) targetPanel.style.display = 'block';
     });
   });
+
+  // Deploy Button Listener
+  const deployBtn = container.querySelector('#btn-trigger-deploy');
+  if (deployBtn) {
+    deployBtn.addEventListener('click', () => {
+      openDeployProgressModal();
+    });
+  }
 
   // Edit Price Modal
   container.querySelectorAll('.btn-edit-price').forEach(btn => {
@@ -301,5 +353,154 @@ function openEditPriceModal(wasteType, onSuccess) {
     } catch (err) {
       alert(`Gagal mengubah harga: ${err.message}`);
     }
+  });
+}
+
+function openDeployProgressModal() {
+  if (!confirm('Apakah Anda yakin ingin memperbarui aplikasi ke versi terbaru dari GitHub?\n\nServer akan melakukan git pull, build TypeScript, dan reload aplikasi (perkiraan 15 - 30 detik).')) {
+    return;
+  }
+
+  const modalHtml = `
+    <div style="text-align: center; padding: 24px 16px;">
+      <div id="deploy-anim-icon" style="margin-bottom: 16px;">
+        <div style="display: inline-block; width: 44px; height: 44px; border: 4px solid #E5E7EB; border-top-color: #15803D; border-radius: 50%; animation: deploySpin 0.9s linear infinite;"></div>
+      </div>
+      <h3 id="deploy-status-title" style="font-size: 1.1rem; font-weight: 800; color: #14532D; margin-bottom: 6px;">
+        Mengirim Sinyal Pembaruan...
+      </h3>
+      <p id="deploy-status-desc" style="font-size: 0.82rem; color: #4B5563; max-width: 400px; margin: 0 auto 18px; line-height: 1.5;">
+        Menghubungi webhook aaPanel untuk memulai proses deploy di server.
+      </p>
+
+      <!-- Progress Bar -->
+      <div style="background: #E5E7EB; border-radius: 999px; height: 10px; overflow: hidden; margin-bottom: 10px;">
+        <div id="deploy-progress-bar" style="background: linear-gradient(90deg, #15803D, #22C55E); height: 100%; width: 15%; transition: width 0.5s ease;"></div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #6B7280; font-weight: 600;">
+        <span id="deploy-phase-text">Fase 1/3: Inisialisasi webhook</span>
+        <span id="deploy-percent-text">15%</span>
+      </div>
+
+      <div id="deploy-error-area" style="display: none; margin-top: 18px;">
+        <div class="alert-banner alert-danger" id="deploy-error-msg" style="margin-bottom: 14px; text-align: left; font-size: 0.78rem;"></div>
+        <button class="btn btn-outline btn-sm" id="btn-deploy-close">Tutup Dialog</button>
+      </div>
+    </div>
+    <style>
+      @keyframes deploySpin { 100% { transform: rotate(360deg); } }
+    </style>
+  `;
+
+  const modal = Modal.open({
+    title: 'Deployment Server aaPanel',
+    content: modalHtml,
+    size: 'sm'
+  });
+
+  const titleEl = modal.element.querySelector('#deploy-status-title');
+  const descEl = modal.element.querySelector('#deploy-status-desc');
+  const barEl = modal.element.querySelector('#deploy-progress-bar');
+  const phaseEl = modal.element.querySelector('#deploy-phase-text');
+  const percentEl = modal.element.querySelector('#deploy-percent-text');
+  const errorArea = modal.element.querySelector('#deploy-error-area');
+  const errorMsg = modal.element.querySelector('#deploy-error-msg');
+  const animIcon = modal.element.querySelector('#deploy-anim-icon');
+  const closeBtn = modal.element.querySelector('#btn-deploy-close');
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => modal.close());
+  }
+
+  const token = auth.getToken();
+
+  fetch('/api/system/trigger-deploy', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  .then(async (res) => {
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Gagal memicu webhook deployment aaPanel.');
+    }
+    return res.json();
+  })
+  .then(() => {
+    // Phase 2: aaPanel running git pull & build
+    titleEl.textContent = 'Server Sedang Membangun Kode...';
+    descEl.textContent = 'aaPanel sedang menjalankan git pull, npm install, & build TypeScript. Mohon tunggu, jangan tutup halaman.';
+    barEl.style.width = '55%';
+    phaseEl.textContent = 'Fase 2/3: Git Pull & Build';
+    percentEl.textContent = '55%';
+
+    let attempts = 0;
+    const maxAttempts = 35; // ~70 seconds max
+    let progress = 55;
+
+    const interval = setInterval(async () => {
+      attempts++;
+      if (progress < 90) {
+        progress += 3;
+        barEl.style.width = `${progress}%`;
+        percentEl.textContent = `${progress}%`;
+      }
+
+      if (attempts >= 4) {
+        phaseEl.textContent = 'Fase 3/3: Me-reload Server';
+        descEl.textContent = 'Server sedang me-restart proses Node. Menghubungkan kembali...';
+      }
+
+      try {
+        const ping = await fetch('/api/bootstrap?t=' + Date.now(), { cache: 'no-store' });
+        if (ping.ok && attempts >= 4) {
+          clearInterval(interval);
+          barEl.style.width = '100%';
+          barEl.style.background = '#15803D';
+          percentEl.textContent = '100%';
+          phaseEl.textContent = 'Selesai';
+          titleEl.textContent = 'Pembaruan Berhasil! 🎉';
+          descEl.textContent = 'Aplikasi telah berhasil diperbarui ke versi terbaru. Memuat ulang antarmuka...';
+          animIcon.innerHTML = `
+            <div style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: #DCFCE7; color: #15803D; border-radius: 50%;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+          `;
+
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        }
+      } catch {
+        // Expected while server restarts
+      }
+
+      if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        titleEl.textContent = 'Pembaruan Sedang Berlangsung di Server';
+        descEl.textContent = 'Proses membutuhkan waktu lebih lama. Silakan muat ulang halaman setelah beberapa saat.';
+        errorArea.style.display = 'block';
+        errorMsg.textContent = 'Info: Sinyal deployment telah berhasil dikirim ke aaPanel. Server sedang menyelesaikan restart.';
+      }
+    }, 2000);
+  })
+  .catch((err) => {
+    titleEl.textContent = 'Gagal Memperbarui';
+    descEl.textContent = 'Terjadi kesalahan saat menghubungi webhook aaPanel.';
+    animIcon.innerHTML = `
+      <div style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: #FEE2E2; color: #B91C1C; border-radius: 50%;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </div>
+    `;
+    errorArea.style.display = 'block';
+    errorMsg.textContent = err.message || 'Koneksi gagal.';
   });
 }

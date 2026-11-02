@@ -1,3 +1,11 @@
+try {
+  if (typeof (process as any).loadEnvFile === 'function') {
+    (process as any).loadEnvFile();
+  }
+} catch {
+  // .env is optional if set via server environment
+}
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
