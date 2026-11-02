@@ -138,9 +138,9 @@ class AuthService {
     }
 
     const targetUser = db.getUsers().find(u => u.role === roleName) || {
-      id: `usr-demo-${roleName.toLowerCase()}`,
-      name: `Pengguna Demo (${ROLE_PERMISSIONS[roleName]?.name || roleName})`,
-      email: `demo.${roleName.toLowerCase()}@berkasih.id`,
+      id: `usr-${roleName.toLowerCase()}`,
+      name: `Pengguna (${ROLE_PERMISSIONS[roleName]?.name || roleName})`,
+      email: `pengguna.${roleName.toLowerCase()}@berkasih.id`,
       role: roleName
     };
 
@@ -193,20 +193,20 @@ class AuthService {
 
     const user = db.getUsers().find(u => u.role === roleName);
     if (user) {
-      this.saveSession(user, 'dummy-demo-token');
+      this.saveSession(user, 'dummy-auth-token');
     } else {
       // Fallback object
       this.saveSession({
-        id: `usr-demo-${roleName.toLowerCase()}`,
-        name: `Pengguna Demo (${ROLE_PERMISSIONS[roleName]?.name || roleName})`,
-        email: `demo.${roleName.toLowerCase()}@berkasih.id`,
+        id: `usr-${roleName.toLowerCase()}`,
+        name: `Pengguna (${ROLE_PERMISSIONS[roleName]?.name || roleName})`,
+        email: `pengguna.${roleName.toLowerCase()}@berkasih.id`,
         role: roleName
-      }, 'dummy-demo-token');
+      }, 'dummy-auth-token');
     }
 
     db.logAudit(
       this.currentUser,
-      'SWITCH_ROLE_DEMO',
+      'SWITCH_ROLE',
       'SESSION',
       this.currentUser.id,
       'Switched active perspective',

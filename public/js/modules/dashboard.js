@@ -41,7 +41,6 @@ export function renderDashboard(container) {
       <div class="page-title-group">
         <h1 class="page-title">
           <span>Selamat Pagi, ${user.name || 'Pengurus'}</span>
-          <span class="badge badge-demo">DEMO DATA</span>
         </h1>
         <p class="page-subtitle">Kondisi terkini Bank Sampah BERKASIH, Kelurahan Karyamulya, Kota Cirebon.</p>
       </div>

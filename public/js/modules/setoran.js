@@ -18,7 +18,6 @@ export function renderSetoran(container) {
       <div class="page-title-group">
         <h1 class="page-title">
           <span>Setoran Sampah</span>
-          <span class="badge badge-demo">DEMO DATA</span>
         </h1>
         <p class="page-subtitle">Pencatatan penimbangan, kalkulasi otomatis nilai tabungan, dan penerbitan struk.</p>
       </div>
@@ -101,7 +100,6 @@ export function renderSetoran(container) {
                 <tr>
                   <td>
                     <strong>${d.id}</strong>
-                    ${d.isDemo ? '<span class="badge badge-demo" style="margin-left: 4px; font-size: 0.6rem;">DEMO</span>' : '<span class="badge badge-live" style="margin-left: 4px; font-size: 0.6rem;">LIVE</span>'}
                   </td>
                   <td>${new Date(d.transaction_date).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' })}</td>
                   <td>

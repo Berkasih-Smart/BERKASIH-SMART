@@ -23,7 +23,6 @@ export function renderInventori(container) {
       <div class="page-title-group">
         <h1 class="page-title">
           <span>Inventori Sampah Gudang</span>
-          <span class="badge badge-demo">DEMO DATA</span>
         </h1>
         <p class="page-subtitle">Monitoring stok material terpilah, ambang batas kapasitas, dan penyaluran ke mitra daur ulang.</p>
       </div>

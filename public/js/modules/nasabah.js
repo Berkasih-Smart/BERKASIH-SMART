@@ -51,7 +51,6 @@ export function renderNasabah(container) {
         <tr>
           <td>
             <strong>${c.customer_code}</strong>
-            ${c.isDemo ? '<span class="badge badge-demo" style="margin-left: 4px; font-size: 0.6rem;">DEMO</span>' : ''}
           </td>
           <td>
             <div style="font-weight: 600; color: #17201A;">${c.name}</div>
@@ -87,7 +86,6 @@ export function renderNasabah(container) {
       <div class="page-title-group">
         <h1 class="page-title">
           <span>Manajemen Nasabah</span>
-          <span class="badge badge-demo">DEMO DATA</span>
         </h1>
         <p class="page-subtitle">Sistem CRM komunitas nasabah Bank Sampah BERKASIH di 15 RW Kelurahan Karyamulya.</p>
       </div>

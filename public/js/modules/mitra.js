@@ -16,7 +16,6 @@ export function renderMitra(container) {
       <div class="page-title-group">
         <h1 class="page-title">
           <span>Manajemen Mitra & Ekosistem Offtaker</span>
-          <span class="badge badge-demo">DEMO DATA</span>
         </h1>
         <p class="page-subtitle">Jejaring industri daur ulang, pengepul, lembaga pemerintah, dan offtaker sirkularitas di Cirebon.</p>
       </div>

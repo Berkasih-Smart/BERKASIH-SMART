@@ -18,7 +18,6 @@ export function renderPenjemputan(container) {
       <div class="page-title-group">
         <h1 class="page-title">
           <span>Manajemen Penjemputan Sampah</span>
-          <span class="badge badge-demo">DEMO DATA</span>
         </h1>
         <p class="page-subtitle">Penjadwalan armada motor roda tiga untuk jemput sampah terpilah langsung dari rumah warga.</p>
       </div>

@@ -23,7 +23,6 @@ export function renderTabungan(container) {
       <div class="page-title-group">
         <h1 class="page-title">
           <span>Tabungan Digital & Penarikan</span>
-          <span class="badge badge-demo">DEMO DATA</span>
         </h1>
         <p class="page-subtitle">Sistem saldo simpanan nasabah berbasis buku besar (ledger) dengan konsistensi finansial mutlak.</p>
       </div>

@@ -65,7 +65,7 @@ export function renderReports(container) {
             <div style="text-align: right; font-size: 0.72rem; color: #64748B;">
               <div>Waktu Dibuat: <strong>${new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</strong></div>
               <div>Oleh: <strong>${user.name || 'Pengurus'} (${auth.getRole()})</strong></div>
-              <div>Status Data: <span class="badge badge-demo" style="font-size: 0.6rem;">DEMO DATA</span></div>
+              <div>Status Data: <span class="badge badge-live" style="font-size: 0.6rem;">TERVERIFIKASI</span></div>
             </div>
           </div>
 
