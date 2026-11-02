@@ -1,0 +1,587 @@
+/* ===================================================================
+   BERKASIH SMART MODULE SPECIFIC STYLES
+   =================================================================== */
+
+/* -------------------------------------------------------------
+   1. BERKASIH PULSE (Signature Feature)
+   ------------------------------------------------------------- */
+.pulse-container {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F9FAF8 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.pulse-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #14532D 0%, #22C55E 50%, #14532D 100%);
+}
+
+.pulse-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.pulse-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.pulse-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #DCFCE7;
+  color: #14532D;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  border: 1px solid #BBF7D0;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #22C55E;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  animation: pulse-ring 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.pulse-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-4);
+}
+
+@media (max-width: 1200px) {
+  .pulse-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .pulse-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .pulse-grid { grid-template-columns: 1fr; }
+}
+
+.pulse-item {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.pulse-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: #CBD5E1;
+}
+
+.pulse-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.pulse-item-name {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+.pulse-item-status {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius-full);
+}
+
+.pulse-item-metric {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.pulse-item-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.pulse-item-desc {
+  font-size: 0.73rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  margin-top: auto;
+}
+
+/* -------------------------------------------------------------
+   2. SMART MAP / GIS
+   ------------------------------------------------------------- */
+.gis-wrapper {
+  position: relative;
+  background-color: #E2E8F0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  height: 620px;
+  display: flex;
+  flex-direction: column;
+}
+
+.gis-map-canvas {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 10;
+  background: #EBF3EA;
+}
+
+.gis-overlay-controls {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  z-index: 20;
+  background-color: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+  max-width: 320px;
+}
+
+.gis-legend {
+  position: absolute;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  z-index: 20;
+  background-color: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+  font-size: var(--font-size-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.gis-privacy-badge {
+  position: absolute;
+  bottom: var(--space-4);
+  left: var(--space-4);
+  z-index: 20;
+  background-color: #0F172A;
+  color: #F8FAFC;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* -------------------------------------------------------------
+   3. CIRCULARITY FLOW
+   ------------------------------------------------------------- */
+.circularity-pipeline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  background: linear-gradient(135deg, #F0FDF4 0%, #FFFFFF 100%);
+  border: 1px solid #BBF7D0;
+  border-radius: var(--radius-xl);
+  overflow-x: auto;
+  margin-bottom: var(--space-6);
+}
+
+.flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 130px;
+  flex: 1;
+}
+
+.flow-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-2);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast);
+}
+
+.flow-step:hover .flow-icon {
+  transform: scale(1.08);
+  background-color: var(--color-secondary-100);
+}
+
+.flow-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-primary-900);
+  margin-bottom: 2px;
+}
+
+.flow-sub {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.flow-connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-secondary);
+  font-size: 1.25rem;
+  padding: 0 var(--space-1);
+}
+
+/* -------------------------------------------------------------
+   4. BERKASIH AI CHAT
+   ------------------------------------------------------------- */
+.ai-chat-card {
+  height: 640px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.ai-messages-pane {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  background-color: #FBFDFB;
+}
+
+.ai-message {
+  display: flex;
+  gap: var(--space-3);
+  max-width: 88%;
+}
+
+.ai-message-user {
+  margin-left: auto;
+  flex-direction: row-reverse;
+}
+
+.ai-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ai-avatar-bot {
+  background: linear-gradient(135deg, #14532D 0%, #15803D 100%);
+  color: #FFFFFF;
+}
+
+.ai-avatar-user {
+  background-color: #E2E8F0;
+  color: #334155;
+}
+
+.ai-bubble {
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+
+.ai-bubble-user {
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border-bottom-right-radius: var(--radius-xs);
+}
+
+.ai-bubble-bot {
+  background-color: #FFFFFF;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-bottom-left-radius: var(--radius-xs);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Explainability Box inside AI Bubble */
+.ai-explainability {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background-color: #F8FAF8;
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-secondary);
+  font-size: 0.78rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ai-explain-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.ai-explain-label {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  min-width: 95px;
+}
+
+.ai-explain-val {
+  color: var(--color-text-primary);
+}
+
+/* -------------------------------------------------------------
+   5. PRINTABLE THERMAL RECEIPT
+   ------------------------------------------------------------- */
+.receipt-paper {
+  width: 320px;
+  margin: 0 auto;
+  background-color: #FFFFFF;
+  padding: var(--space-6) var(--space-5);
+  border: 1px solid #E2E8F0;
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-family-mono);
+  font-size: 0.78rem;
+  color: #1E293B;
+  line-height: 1.5;
+}
+
+.receipt-divider {
+  border-top: 1px dashed #CBD5E1;
+  margin: var(--space-3) 0;
+}
+
+.receipt-header {
+  text-align: center;
+  margin-bottom: var(--space-3);
+}
+
+.receipt-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #0F172A;
+}
+
+.receipt-sub {
+  font-size: 0.7rem;
+  color: #64748B;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+
+.receipt-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 0.88rem;
+  margin-top: var(--space-2);
+}
+
+/* -------------------------------------------------------------
+   6. CUSTOMER PORTAL (FINTECH / MOBILE VIEW)
+   ------------------------------------------------------------- */
+.customer-hero-card {
+  background: linear-gradient(135deg, #14532D 0%, #15803D 60%, #166534 100%);
+  color: #FFFFFF;
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(20, 83, 45, 0.4);
+  margin-bottom: var(--space-6);
+}
+
+.customer-hero-card::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.3) 0%, rgba(34, 197, 94, 0) 70%);
+  border-radius: 50%;
+}
+
+.customer-balance-val {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: var(--space-2) 0;
+}
+
+.milestone-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin: var(--space-6) 0;
+}
+
+.milestone-stepper::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 10px;
+  right: 10px;
+  height: 2px;
+  background-color: var(--color-border);
+  z-index: 1;
+}
+
+.milestone-node {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.milestone-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.milestone-node.completed .milestone-circle {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: #FFFFFF;
+}
+
+.milestone-node.active .milestone-circle {
+  background-color: #FFFFFF;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+}
+
+.milestone-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.milestone-node.completed .milestone-label {
+  color: var(--color-primary);
+}
+
+/* Bottom Nav for Mobile Customer */
+.customer-mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background-color: #FFFFFF;
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+  z-index: 50;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 6px;
+  transition: color var(--transition-fast);
+}
+
+.mobile-nav-item.active {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .customer-mobile-nav {
+    display: flex;
+  }
+}

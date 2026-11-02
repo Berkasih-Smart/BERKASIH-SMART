@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none">
+  <defs>
+    <linearGradient id="berkasihGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14532D"/>
+      <stop offset="60%" stop-color="#15803D"/>
+      <stop offset="100%" stop-color="#22C55E"/>
+    </linearGradient>
+    <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22C55E"/>
+      <stop offset="100%" stop-color="#86EFAC"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Shield/Rounded Hexagon -->
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="#14532D" />
+  <!-- Circular Loops & Arrows -->
+  <path d="M24 10C16.268 10 10 16.268 10 24C10 27.866 11.567 31.366 14.1 33.9L17.5 30.5C15.9 28.9 15 26.6 15 24C15 19.03 19.03 15 24 15V19L29 12.5L24 6V10Z" fill="#22C55E" opacity="0.95"/>
+  <path d="M24 38C31.732 38 38 31.732 38 24C38 20.134 36.433 16.634 33.9 14.1L30.5 17.5C32.1 19.1 33 21.4 33 24C33 28.97 28.97 33 24 33V29L19 35.5L24 42V38Z" fill="#4ADE80"/>
+  <!-- Central Digital Leaf Core -->
+  <path d="M24 18C20 22 20 26 24 30C28 26 28 22 24 18Z" fill="#FFFFFF"/>
+  <circle cx="24" cy="24" r="2.5" fill="#14532D"/>
+  <circle cx="14" cy="18" r="1.5" fill="#86EFAC"/>
+  <circle cx="34" cy="30" r="1.5" fill="#86EFAC"/>
+</svg>
