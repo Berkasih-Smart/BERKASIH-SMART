@@ -17,8 +17,13 @@ export function verifyPassword(password: string, hash: string, salt: string): bo
   }
 }
 
-export function signToken(payload: object): string {
-  const data = Buffer.from(JSON.stringify(payload)).toString('base64url');
+export function signToken(payload: object, expiresInMs = 8 * 3600 * 1000): string {
+  const fullPayload = {
+    ...payload,
+    exp: Date.now() + expiresInMs,
+    iat: Date.now(),
+  };
+  const data = Buffer.from(JSON.stringify(fullPayload)).toString('base64url');
   const signature = createHmac('sha256', SECRET_KEY).update(data).digest('base64url');
   return `${data}.${signature}`;
 }
@@ -29,7 +34,11 @@ export function verifyToken(token: string): any {
   const expectedSig = createHmac('sha256', SECRET_KEY).update(data).digest('base64url');
   if (signature !== expectedSig) return null;
   try {
-    return JSON.parse(Buffer.from(data, 'base64url').toString('utf8'));
+    const payload = JSON.parse(Buffer.from(data, 'base64url').toString('utf8'));
+    if (payload.exp && Date.now() > payload.exp) {
+      return null;
+    }
+    return payload;
   } catch {
     return null;
   }

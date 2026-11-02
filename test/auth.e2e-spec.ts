@@ -78,4 +78,51 @@ describe('Auth Module (e2e)', () => {
 
     expect(res.status).toBe(401);
   });
+
+  it('Hardening: rejects invalid email format with 400 Bad Request', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({
+        email: 'invalid-email-format',
+        password: 'password123',
+      });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('Hardening: rejects short password (< 6 chars) with 400 Bad Request', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({
+        email: 'hendra@berkasih.id',
+        password: '123',
+      });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('Hardening: locks account after 5 consecutive failed attempts', async () => {
+    const targetEmail = 'rian.ops@berkasih.id';
+
+    // 5 failed attempts
+    for (let i = 0; i < 5; i++) {
+      await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .send({
+          email: targetEmail,
+          password: 'wrong-password',
+        });
+    }
+
+    // 6th attempt even with correct password should be rejected with 429 or 401 lock message
+    const lockedRes = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({
+        email: targetEmail,
+        password: 'password123',
+      });
+
+    expect(lockedRes.status).toBe(429);
+    expect(lockedRes.body.message).toContain('dikunci');
+  });
 });

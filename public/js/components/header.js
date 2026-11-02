@@ -200,22 +200,12 @@ export function openLoginModal() {
 
       <div class="form-group">
         <label class="form-label" style="font-size: 0.8rem; font-weight: 600;">Email Akun</label>
-        <input type="email" id="login-email-input" class="form-input" placeholder="contoh: hendra@berkasih.id" required value="hendra@berkasih.id" style="font-size: 0.85rem;" />
+        <input type="email" id="login-email-input" class="form-input" placeholder="nama@email.com" required style="font-size: 0.85rem;" />
       </div>
 
       <div class="form-group">
         <label class="form-label" style="font-size: 0.8rem; font-weight: 600;">Kata Sandi</label>
-        <input type="password" id="login-password-input" class="form-input" placeholder="Default: password123" required value="password123" style="font-size: 0.85rem;" />
-      </div>
-
-      <div style="margin-top: 4px;">
-        <span style="font-size: 0.72rem; color: var(--color-text-muted); display: block; margin-bottom: 6px;">Pilih Cepat Akun Demo (Default Password: <code>password123</code>):</span>
-        <div class="flex gap-2 flex-wrap" style="font-size: 0.72rem;">
-          <button type="button" class="btn btn-secondary btn-xs demo-fill-btn" data-email="hendra@berkasih.id">Super Admin</button>
-          <button type="button" class="btn btn-secondary btn-xs demo-fill-btn" data-email="nurul@berkasih.id">Manager</button>
-          <button type="button" class="btn btn-secondary btn-xs demo-fill-btn" data-email="rian.ops@berkasih.id">Operator</button>
-          <button type="button" class="btn btn-secondary btn-xs demo-fill-btn" data-email="siti.aminah@gmail.com">Nasabah</button>
-        </div>
+        <input type="password" id="login-password-input" class="form-input" placeholder="Masukkan kata sandi" required style="font-size: 0.85rem;" />
       </div>
     </form>
   `;
@@ -237,14 +227,6 @@ export function openLoginModal() {
   const emailInput = document.getElementById('login-email-input');
   const passwordInput = document.getElementById('login-password-input');
   const submitBtn = document.getElementById('login-submit-btn');
-
-  content.querySelectorAll('.demo-fill-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      emailInput.value = btn.getAttribute('data-email');
-      passwordInput.value = 'password123';
-      errorAlert.style.display = 'none';
-    });
-  });
 
   document.getElementById('login-cancel-btn')?.addEventListener('click', () => Modal.close());
 

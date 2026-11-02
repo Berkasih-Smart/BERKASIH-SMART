@@ -38,9 +38,8 @@ export function renderLoginPage(container) {
               type="email"
               id="page-email-input"
               class="form-input"
-              placeholder="contoh: hendra@berkasih.id"
+              placeholder="nama@email.com"
               required
-              value="hendra@berkasih.id"
               style="font-size: 0.88rem; height: 42px;"
             />
           </div>
@@ -51,9 +50,8 @@ export function renderLoginPage(container) {
               type="password"
               id="page-password-input"
               class="form-input"
-              placeholder="Default: password123"
+              placeholder="Masukkan kata sandi akun"
               required
-              value="password123"
               style="font-size: 0.88rem; height: 42px;"
             />
           </div>
@@ -68,27 +66,6 @@ export function renderLoginPage(container) {
           </button>
         </form>
 
-        <!-- Quick Demo Accounts -->
-        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--color-border);">
-          <span style="font-size: 0.74rem; font-weight: 600; color: var(--color-text-muted); display: block; margin-bottom: 8px; text-align: center;">
-            Akses Cepat Demo (Sandi: <code>password123</code>):
-          </span>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <button type="button" class="btn btn-secondary btn-xs demo-fill-page" data-email="hendra@berkasih.id" style="justify-content: center; padding: 6px;">
-              Super Admin
-            </button>
-            <button type="button" class="btn btn-secondary btn-xs demo-fill-page" data-email="nurul@berkasih.id" style="justify-content: center; padding: 6px;">
-              Manager
-            </button>
-            <button type="button" class="btn btn-secondary btn-xs demo-fill-page" data-email="rian.ops@berkasih.id" style="justify-content: center; padding: 6px;">
-              Operator Loket
-            </button>
-            <button type="button" class="btn btn-secondary btn-xs demo-fill-page" data-email="siti.aminah@gmail.com" style="justify-content: center; padding: 6px;">
-              Nasabah (Warga)
-            </button>
-          </div>
-        </div>
-
       </div>
     </div>
   `;
@@ -98,15 +75,6 @@ export function renderLoginPage(container) {
   const emailInput = container.querySelector('#page-email-input');
   const passwordInput = container.querySelector('#page-password-input');
   const submitBtn = container.querySelector('#page-login-btn');
-
-  container.querySelectorAll('.demo-fill-page').forEach(btn => {
-    btn.addEventListener('click', () => {
-      emailInput.value = btn.getAttribute('data-email');
-      passwordInput.value = 'password123';
-      errorAlert.style.display = 'none';
-      form.requestSubmit();
-    });
-  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
