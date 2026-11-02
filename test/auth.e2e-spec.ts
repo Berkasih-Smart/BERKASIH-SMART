@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { SeedService } from '../src/database/seed.service';
 
 describe('Auth Module (e2e)', () => {
   let app: INestApplication;
@@ -9,7 +10,7 @@ describe('Auth Module (e2e)', () => {
   beforeAll(async () => {
     app = await NestFactory.create(AppModule, { logger: false });
     await app.init();
-    await request(app.getHttpServer()).post('/api/system/reset-demo');
+    await app.get(SeedService).runSeed();
   });
 
   afterAll(async () => {

@@ -65,18 +65,6 @@ class DatabaseEngine {
     window.dispatchEvent(event);
   }
 
-  async resetToDemo() {
-    try {
-      await fetch('/api/system/reset-demo', { method: 'POST' });
-      await this.syncWithBackend();
-    } catch (e) {
-      console.warn('Backend reset failed, resetting local store:', e);
-      this.data = JSON.parse(JSON.stringify(INITIAL_DATA));
-      this.persist();
-      this.notifyChange('DATABASE_RESET', { message: 'Database reset to verified demo seed' });
-    }
-  }
-
   // -------------------------------------------------------------
   // Audit Trail Logging
   // -------------------------------------------------------------

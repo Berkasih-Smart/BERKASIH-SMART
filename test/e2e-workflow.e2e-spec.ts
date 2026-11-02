@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { SeedService } from '../src/database/seed.service';
 
 describe('End-to-End Workflow & Persistence Lifecycle', () => {
   let app: INestApplication;
@@ -17,8 +18,7 @@ describe('End-to-End Workflow & Persistence Lifecycle', () => {
     app = await NestFactory.create(AppModule, { logger: false });
     await app.init();
 
-    // Reset to clean demo data
-    await request(app.getHttpServer()).post('/api/system/reset-demo');
+    await app.get(SeedService).runSeed();
 
     // Fetch initial customer state
     const initialBoot = await request(app.getHttpServer()).get('/api/bootstrap');

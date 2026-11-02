@@ -1,21 +1,12 @@
 import { Injectable, BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { SeedService } from '../../database/seed.service';
 import * as http from 'http';
 import * as https from 'https';
 import { URL } from 'url';
 
 @Injectable()
 export class SystemService {
-  constructor(
-    private readonly seedService: SeedService,
-    private readonly dataSource: DataSource,
-  ) {}
-
-  async resetDemo() {
-    await this.seedService.runSeed();
-    return { success: true, message: 'Database reset to verified demo seed' };
-  }
+  constructor(private readonly dataSource: DataSource) {}
 
   async triggerDeploy(user: any) {
     const webhookUrl = process.env.AAPANEL_WEBHOOK_URL;

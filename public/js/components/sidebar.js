@@ -214,7 +214,6 @@ export function renderSidebar(container, activeRoute = 'dashboard', onNavigate =
     <div style="padding: 12px 16px; border-top: 1px solid var(--color-border); background-color: #F9FAFB; font-size: 0.72rem;">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
         <span class="badge badge-live" title="Data operasional terverifikasi Bank Sampah Karyamulya">TERVERIFIKASI</span>
-        <button id="btn-reset-demo" style="font-size: 0.68rem; color: #15803D; font-weight: 600; text-decoration: underline;">Reset Data</button>
       </div>
       <div style="color: #6B7280; font-size: 0.66rem; line-height: 1.3;">
         "Dari Sampah Menjadi Data, Dari Data Menjadi Aksi."
@@ -242,13 +241,4 @@ export function renderSidebar(container, activeRoute = 'dashboard', onNavigate =
       }
     });
   });
-
-  const resetBtn = container.querySelector('#btn-reset-demo');
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      if (confirm('Kembalikan database ke kondisi awal (Karyamulya)?')) {
-        db.resetToDemo();
-      }
-    });
-  }
 }

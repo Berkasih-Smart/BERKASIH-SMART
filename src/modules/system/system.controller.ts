@@ -6,12 +6,6 @@ import { SuperAdminGuard } from '../auth/super-admin.guard';
 export class SystemController {
   constructor(private readonly systemService: SystemService) {}
 
-  @Post('reset-demo')
-  @HttpCode(HttpStatus.OK)
-  async resetDemo() {
-    return this.systemService.resetDemo();
-  }
-
   @Post('trigger-deploy')
   @UseGuards(SuperAdminGuard)
   @HttpCode(HttpStatus.OK)

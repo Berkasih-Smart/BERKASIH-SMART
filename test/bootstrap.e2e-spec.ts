@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 
-describe('Bootstrap & System Reset (e2e)', () => {
+describe('Bootstrap (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -34,11 +34,5 @@ describe('Bootstrap & System Reset (e2e)', () => {
 
     expect(Array.isArray(data.rw)).toBe(true);
     expect(Array.isArray(data.service_points)).toBe(true);
-  });
-
-  it('POST /api/system/reset-demo resets database to verified demo seed', async () => {
-    const res = await request(app.getHttpServer()).post('/api/system/reset-demo');
-    expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
   });
 });
