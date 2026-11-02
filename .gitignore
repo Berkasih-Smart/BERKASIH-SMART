@@ -27,3 +27,6 @@ dist/
 # Superpowers scratchpad
 .superpowers/
 
+# Playwright MCP artifacts
+.playwright-mcp/
+

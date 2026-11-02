@@ -63,6 +63,11 @@ button, input, select, textarea {
   line-height: inherit;
 }
 
+:focus-visible {
+  outline: 2px solid var(--color-primary-600);
+  outline-offset: 2px;
+}
+
 button {
   cursor: pointer;
   background: none;
@@ -88,6 +93,27 @@ img, svg {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #9CA3AF;
+}
+
+@media (max-width: 768px) {
+  .hidden-mobile {
+    display: none !important;
+  }
+}
+
+/* Standalone Layout (Public Landing & Login Pages) */
+body.layout-standalone .app-sidebar,
+body.layout-standalone .app-header {
+  display: none !important;
+}
+
+body.layout-standalone .app-wrapper {
+  margin-left: 0 !important;
+}
+
+body.layout-standalone .page-container {
+  padding: 0 !important;
+  max-width: 100% !important;
 }
 
 /* Application Shell Layout */

@@ -40,10 +40,10 @@ class AppController {
 
   async init() {
     this.setupListeners();
+    this.handleRoute();
     if (db && db.isReady) {
       await db.isReady;
     }
-    this.handleRoute();
   }
 
   setupListeners() {
@@ -77,7 +77,7 @@ class AppController {
 
   handleRoute() {
     let rawHash = window.location.hash.replace('#', '').trim();
-    const landingAnchors = ['katalog-harga', 'dampak', 'cara-kerja', 'jadwal'];
+    const landingAnchors = ['katalog-harga', 'kalkulator', 'dampak', 'cara-kerja', 'jadwal'];
     if (landingAnchors.includes(rawHash)) {
       if (this.currentRoute === 'landing') {
         const el = document.getElementById(rawHash);
@@ -123,10 +123,13 @@ class AppController {
   }
 
   renderShell(activeRoute) {
+    const isStandalone = activeRoute === 'login' || activeRoute === 'landing';
+    document.body.classList.toggle('layout-standalone', isStandalone);
+
     const headerContainer = document.getElementById('app-header-slot');
     const sidebarContainer = document.getElementById('app-sidebar-slot');
 
-    if (activeRoute === 'login' || activeRoute === 'landing') {
+    if (isStandalone) {
       if (headerContainer) headerContainer.style.display = 'none';
       if (sidebarContainer) sidebarContainer.style.display = 'none';
       return;

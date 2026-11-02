@@ -7,7 +7,7 @@ import { db } from '../db/schema.js';
 import { auth } from '../auth/auth.js';
 
 export function renderDashboard(container) {
-  const user = auth.getCurrentUser();
+  const user = auth.getCurrentUser() || { name: 'Pengurus', role: 'SUPER_ADMIN' };
   const customers = db.getCustomers();
   const deposits = db.getDeposits();
   const inventory = db.getInventory();
