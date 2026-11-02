@@ -538,6 +538,14 @@ class DatabaseEngine {
 
     this.logAudit(user, 'REGISTER_CUSTOMER', 'CUSTOMERS', id, 'N/A', `Registered ${newCustomer.name} (${newCustomer.customer_code})`);
     this.notifyChange('CUSTOMER_ADDED', { customerId: id });
+
+    // Persist to SQLite backend
+    fetch('/api/customers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...payload, user })
+    }).catch(e => console.warn('Customer backend sync warning:', e));
+
     return newCustomer;
   }
 

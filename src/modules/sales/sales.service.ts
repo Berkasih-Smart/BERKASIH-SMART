@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class SalesService {
@@ -41,8 +42,13 @@ export class SalesService {
           throw new BadRequestException(`Stock for ${inv.name} is insufficient. Available: ${inv.current_stock} kg, Requested: ${qty} kg.`);
         }
 
-        const price = parseFloat(item.price_per_kg || item.price);
-        const subtotal = Math.round(qty * price);
+        const wasteType: any = await manager.getRepository('WasteType').findOne({
+          where: { id: item.waste_type_id },
+        });
+
+        const rawPrice = item.price_per_kg ?? item.price ?? (wasteType ? wasteType.current_price_per_kg : 0);
+        const price = parseFloat(rawPrice);
+        const subtotal = Math.round(qty * (isNaN(price) ? 0 : price));
 
         totalWeight += qty;
         totalValue += subtotal;
@@ -60,6 +66,13 @@ export class SalesService {
         inv.outgoing_total = parseFloat(((inv.outgoing_total || 0) + qty).toFixed(2));
         await manager.getRepository('Inventory').save(inv);
       }
+
+      totalWeight = parseFloat(totalWeight.toFixed(2));
+
+      // Update partner metrics
+      partner.total_purchased_kg = parseFloat(((partner.total_purchased_kg || 0) + totalWeight).toFixed(2));
+      partner.total_transactions = (partner.total_transactions || 0) + 1;
+      await manager.getRepository('Partner').save(partner);
 
       const now = new Date().toISOString();
       const count = await manager.getRepository('Sale').count();
@@ -82,7 +95,7 @@ export class SalesService {
 
       // Audit Log
       const auditLog = manager.getRepository('AuditLog').create({
-        id: `AUD-${Date.now().toString().slice(-6)}`,
+        id: `AUD-${Date.now()}-${randomUUID().substring(0, 8)}`,
         user: payload.user?.name || 'Manager',
         role: payload.user?.role || 'MANAGER',
         action: 'CREATE_SALE',

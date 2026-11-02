@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class DepositsService {
@@ -37,7 +38,7 @@ export class DepositsService {
           throw new BadRequestException(`Waste type ${item.waste_type_id} is invalid.`);
         }
 
-        const price = parseFloat(item.price_per_kg || (wasteType as any).current_price_per_kg);
+        const price = parseFloat((wasteType as any).current_price_per_kg);
         const subtotal = Math.round(weight * price);
 
         totalWeight += weight;
@@ -86,7 +87,7 @@ export class DepositsService {
 
       // 3. Savings Transaction Ledger Record
       const savingsTx = manager.getRepository('SavingsTransaction').create({
-        id: `TX-SAV-${Date.now().toString().slice(-6)}`,
+        id: `TX-SAV-${Date.now()}-${randomUUID().substring(0, 8)}`,
         customer_id: (customer as any).id,
         transaction_type: 'DEPOSIT',
         amount: totalValue,
@@ -134,7 +135,7 @@ export class DepositsService {
 
       // 5. Audit Log
       const auditLog = manager.getRepository('AuditLog').create({
-        id: `AUD-${Date.now().toString().slice(-6)}`,
+        id: `AUD-${Date.now()}-${randomUUID().substring(0, 8)}`,
         user: payload.user?.name || 'Operator',
         role: payload.user?.role || 'OPERATOR',
         action: 'CREATE_DEPOSIT',

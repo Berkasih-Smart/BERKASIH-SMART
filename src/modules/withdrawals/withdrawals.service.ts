@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class WithdrawalsService {
@@ -42,7 +43,7 @@ export class WithdrawalsService {
 
       // Audit Log
       const auditLog = manager.getRepository('AuditLog').create({
-        id: `AUD-${Date.now().toString().slice(-6)}`,
+        id: `AUD-${Date.now()}-${randomUUID().substring(0, 8)}`,
         user: payload.user?.name || (customer as any).name,
         role: payload.user?.role || 'CUSTOMER',
         action: 'REQUEST_WITHDRAWAL',
@@ -90,7 +91,7 @@ export class WithdrawalsService {
 
       // Savings Transaction Ledger
       const savingsTx = manager.getRepository('SavingsTransaction').create({
-        id: `TX-SAV-${Date.now().toString().slice(-6)}`,
+        id: `TX-SAV-${Date.now()}-${randomUUID().substring(0, 8)}`,
         customer_id: customer.id,
         transaction_type: 'WITHDRAWAL',
         amount: wdr.amount,
@@ -105,7 +106,7 @@ export class WithdrawalsService {
 
       // Audit Log
       const auditLog = manager.getRepository('AuditLog').create({
-        id: `AUD-${Date.now().toString().slice(-6)}`,
+        id: `AUD-${Date.now()}-${randomUUID().substring(0, 8)}`,
         user: payload?.user?.name || 'Manager',
         role: payload?.user?.role || 'MANAGER',
         action: 'APPROVE_WITHDRAWAL',

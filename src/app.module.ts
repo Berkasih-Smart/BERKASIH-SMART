@@ -8,6 +8,7 @@ import { SystemModule } from './modules/system/system.module';
 import { DepositsModule } from './modules/deposits/deposits.module';
 import { WithdrawalsModule } from './modules/withdrawals/withdrawals.module';
 import { SalesModule } from './modules/sales/sales.module';
+import { CustomersModule } from './modules/customers/customers.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SalesModule } from './modules/sales/sales.module';
     DepositsModule,
     WithdrawalsModule,
     SalesModule,
+    CustomersModule,
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'public'),
       exclude: ['/api/(.*)'],
