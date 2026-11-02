@@ -361,7 +361,7 @@ export function renderDashboard(container) {
   const quickDepositBtn = container.querySelector('#dash-quick-deposit');
   if (quickDepositBtn) {
     quickDepositBtn.addEventListener('click', () => {
-      window.dispatchEvent(new CustomEvent('berkasih:open-deposit-modal'));
+      window.dispatchEvent(new CustomEvent('app:open-deposit-modal'));
     });
   }
 

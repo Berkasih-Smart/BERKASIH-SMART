@@ -10,7 +10,7 @@
 
 import { INITIAL_DATA } from './initial_data.js';
 
-const STORAGE_KEY = 'berkasih_smart_database_v1';
+const STORAGE_KEY = 'smart_waste_local_cache';
 
 class DatabaseEngine {
   constructor() {
@@ -42,7 +42,7 @@ class DatabaseEngine {
 
   notifyChange(eventType = 'GENERAL_UPDATE', details = {}) {
     this.persist();
-    const event = new CustomEvent('berkasih:state-changed', {
+    const event = new CustomEvent('app:state-changed', {
       detail: { eventType, details, timestamp: new Date().toISOString() }
     });
     window.dispatchEvent(event);

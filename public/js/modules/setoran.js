@@ -147,7 +147,7 @@ export function renderSetoran(container) {
   });
 
   // Listen to Global Open Deposit Modal Event (triggered from Header or Dashboard)
-  window.addEventListener('berkasih:open-deposit-modal', () => {
+  window.addEventListener('app:open-deposit-modal', () => {
     openDepositWizard();
   });
 }

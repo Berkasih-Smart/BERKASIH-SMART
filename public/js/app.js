@@ -46,13 +46,13 @@ class AppController {
     window.addEventListener('hashchange', () => this.handleRoute());
 
     // Reactive State Changed Listener (When deposits, inventory, savings or price changes)
-    window.addEventListener('berkasih:state-changed', (e) => {
+    window.addEventListener('app:state-changed', (e) => {
       console.log('Database state changed:', e.detail);
       this.refreshCurrentView();
     });
 
     // Role Switcher / Auth Changed Listener
-    window.addEventListener('berkasih:auth-changed', (e) => {
+    window.addEventListener('app:auth-changed', (e) => {
       console.log('Role switched to:', e.detail.role);
       // If Customer, default to customer-portal
       if (e.detail.role === 'CUSTOMER') {
@@ -64,7 +64,7 @@ class AppController {
     });
 
     // Quick Deposit Shortcut
-    window.addEventListener('berkasih:open-deposit-modal', () => {
+    window.addEventListener('app:open-deposit-modal', () => {
       openDepositWizard();
     });
   }

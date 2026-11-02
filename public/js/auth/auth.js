@@ -130,7 +130,7 @@ class AuthService {
       `Active Role: ${roleName}`
     );
 
-    const event = new CustomEvent('berkasih:auth-changed', {
+    const event = new CustomEvent('app:auth-changed', {
       detail: { user: this.currentUser, role: roleName }
     });
     window.dispatchEvent(event);
