@@ -83,22 +83,45 @@ Platform menyediakan 5 perspektif peran yang dapat diuji langsung melalui tombol
 
 ## 💻 5. Cara Menjalankan Aplikasi Secara Lokal
 
-Aplikasi menggunakan arsitektur web modern tanpa dependensi berat, berjalan mandiri menggunakan server PowerShell bawaan Windows:
+Aplikasi menggunakan arsitektur fullstack dengan backend **NestJS** dan basis data lokal **SQLite (`database.sqlite`)**:
 
-```powershell
-# Jalankan dari direktori project
-powershell -ExecutionPolicy Bypass -File .\serve.ps1 -Port 5173
+### Persyaratan:
+- Node.js (v18+ / v20+ / v22+)
+- npm (bawaan Node.js)
+
+### Langkah Menjalankan:
+```bash
+# 1. Pasang dependensi
+npm install
+
+# 2. Jalankan server (NestJS + SQLite)
+npm start
+# atau mode development:
+npm run start:dev
 ```
 
-Buka peramban (Google Chrome / Edge) di:
-👉 **`http://localhost:5173/`**
+Buka peramban (Google Chrome / Edge / Firefox) di:
+👉 **`http://localhost:3000/`**
+
+> **Catatan Basis Data:**
+> - File basis data `database.sqlite` akan otomatis dibuat dan di-seed dengan data awal saat pertama kali server dijalankan.
+> - Seluruh transaksi (setoran, penarikan saldo, penjualan material) tersimpan persisten di dalam `database.sqlite`.
+
+### Menjalankan Pengujian Otomatis (E2E & Unit Test):
+```bash
+# Menjalankan seluruh test e2e
+npm run test:e2e
+
+# Menjalankan unit test
+npm test
+```
 
 ### Uji Fitur Utama:
-1. **Setor Sampah Cepat**: Klik tombol hijau **`+ Setor Sampah`** di bilah atas untuk membuka modal 7 langkah, pilih nasabah, masukkan berat, simpan, dan periksa struk digital ber-QR.
+1. **Setor Sampah Cepat**: Klik tombol hijau **`+ Setor Sampah`** di bilah atas untuk membuka modal 7 langkah, pilih nasabah, masukkan berat, simpan, dan periksa struk digital ber-QR. Data otomatis tersimpan persisten ke SQLite.
 2. **Beralih Peran**: Gunakan dropdown **`Peran:`** di kanan atas untuk berpindah antara *Super Admin*, *Manager*, *Operator*, *Nasabah (Siti Aminah)*, atau *Mitra*.
-3. **Tanya BERKASIH AI**: Masuk ke menu **BERKASIH AI**, klik salah satu chip pertanyaan (misal: *"Berapa total sampah bulan ini?"*) dan amati kotak transparansi data (*Explainability Record*).
-4. **Peta Smart Map**: Masuk ke menu **Smart Map (GIS)**, klik salah satu poligon RW (misal RW 04 atau RW 06) untuk melihat detail populasi dan penetrasi nasabah.
-5. **Uji Simulasi Data Minim**: Di menu **Forecast**, klik tombol *Simulasi Kondisi Data Minim* untuk melihat respons aman *Forecast Unavailable* per Aturan #20.
+3. **Tanya AI Decision Support**: Masuk ke menu **AI**, klik salah satu chip pertanyaan dan amati kotak transparansi data (*Explainability Record*).
+4. **Peta Smart Map**: Masuk ke menu **Smart Map (GIS)**, klik salah satu poligon RW untuk melihat detail populasi dan penetrasi nasabah.
+5. **Uji Simulasi Data Minim**: Di menu **Forecast**, amati respons proteksi data minim.
 
 ---
 
