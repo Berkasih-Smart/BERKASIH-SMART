@@ -36,8 +36,11 @@ class AppController {
     this.init();
   }
 
-  init() {
+  async init() {
     this.setupListeners();
+    if (db && db.isReady) {
+      await db.isReady;
+    }
     this.handleRoute();
   }
 

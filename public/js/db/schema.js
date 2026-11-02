@@ -15,6 +15,23 @@ const STORAGE_KEY = 'smart_waste_local_cache';
 class DatabaseEngine {
   constructor() {
     this.data = this.loadDatabase();
+    this.isReady = this.syncWithBackend();
+  }
+
+  async syncWithBackend() {
+    try {
+      const res = await fetch('/api/bootstrap');
+      if (res.ok) {
+        const serverData = await res.json();
+        this.data = serverData;
+        this.persist(this.data);
+        this.notifyChange('BACKEND_SYNC', { message: 'Synced with SQLite server' });
+        return true;
+      }
+    } catch (e) {
+      console.warn('Backend unavailable or offline, using local cache:', e);
+    }
+    return false;
   }
 
   loadDatabase() {
@@ -48,10 +65,16 @@ class DatabaseEngine {
     window.dispatchEvent(event);
   }
 
-  resetToDemo() {
-    this.data = JSON.parse(JSON.stringify(INITIAL_DATA));
-    this.persist();
-    this.notifyChange('DATABASE_RESET', { message: 'Database reset to verified demo seed' });
+  async resetToDemo() {
+    try {
+      await fetch('/api/system/reset-demo', { method: 'POST' });
+      await this.syncWithBackend();
+    } catch (e) {
+      console.warn('Backend reset failed, resetting local store:', e);
+      this.data = JSON.parse(JSON.stringify(INITIAL_DATA));
+      this.persist();
+      this.notifyChange('DATABASE_RESET', { message: 'Database reset to verified demo seed' });
+    }
   }
 
   // -------------------------------------------------------------
@@ -252,6 +275,14 @@ class DatabaseEngine {
     });
 
     this.notifyChange('DEPOSIT_CREATED', { depositId, customerId: customer.id });
+
+    // Persist to SQLite backend
+    fetch('/api/deposits', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...depositPayload, user })
+    }).catch(e => console.warn('Deposit backend sync warning:', e));
+
     return depositRecord;
   }
 
@@ -300,6 +331,14 @@ class DatabaseEngine {
     );
 
     this.notifyChange('WITHDRAWAL_REQUESTED', { wdrId });
+
+    // Persist to SQLite backend
+    fetch('/api/withdrawals/request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customer_id: customerId, amount, payout_method: payoutMethod, user })
+    }).catch(e => console.warn('Withdrawal request backend sync warning:', e));
+
     return wdrRecord;
   }
 
@@ -349,6 +388,14 @@ class DatabaseEngine {
     );
 
     this.notifyChange('WITHDRAWAL_COMPLETED', { wdrId: wdr.id });
+
+    // Persist to SQLite backend
+    fetch(`/api/withdrawals/${wdr.id}/complete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user })
+    }).catch(e => console.warn('Withdrawal completion backend sync warning:', e));
+
     return wdr;
   }
 
@@ -433,6 +480,14 @@ class DatabaseEngine {
     );
 
     this.notifyChange('SALE_RECORDED', { saleId });
+
+    // Persist to SQLite backend
+    fetch('/api/sales', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...salePayload, user })
+    }).catch(e => console.warn('Sale backend sync warning:', e));
+
     return saleRecord;
   }
 
