@@ -219,6 +219,12 @@ export function renderSidebar(container, activeRoute = 'dashboard', onNavigate =
       <div style="color: #6B7280; font-size: 0.66rem; line-height: 1.3;">
         "Dari Sampah Menjadi Data, Dari Data Menjadi Aksi."
       </div>
+      <div style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed var(--color-border);">
+        <a href="#landing" style="font-size: 0.72rem; color: #15803D; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          Halaman Publik (Landing)
+        </a>
+      </div>
     </div>
   `;
 

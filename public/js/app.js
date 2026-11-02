@@ -30,6 +30,7 @@ import { renderReports } from './modules/reports.js';
 import { renderSystem } from './modules/system.js';
 import { renderCustomerPortal } from './modules/customerportal.js';
 import { renderLoginPage } from './modules/login.js';
+import { renderLandingPage } from './modules/landing.js';
 
 class AppController {
   constructor() {
@@ -75,14 +76,27 @@ class AppController {
   }
 
   handleRoute() {
-    let route = window.location.hash.replace('#', '').trim() || 'dashboard';
+    let rawHash = window.location.hash.replace('#', '').trim();
+    const landingAnchors = ['katalog-harga', 'dampak', 'cara-kerja', 'jadwal'];
+    if (landingAnchors.includes(rawHash)) {
+      if (this.currentRoute === 'landing') {
+        const el = document.getElementById(rawHash);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+      rawHash = 'landing';
+    }
+
+    let route = rawHash || (auth.isAuthenticated() ? 'dashboard' : 'landing');
 
     // Route permissions & auth check
     if (!auth.isAuthenticated()) {
-      route = 'login';
-      if (window.location.hash !== '#login') {
-        window.location.hash = '#login';
-        return;
+      if (route !== 'landing' && route !== 'login') {
+        route = 'login';
+        if (window.location.hash !== '#login') {
+          window.location.hash = '#login';
+          return;
+        }
       }
     } else if (route === 'login') {
       route = auth.getRole() === 'CUSTOMER' ? 'customer-portal' : 'dashboard';
@@ -95,7 +109,7 @@ class AppController {
       route = 'customer-portal';
     }
 
-    if (route !== 'login' && !auth.hasPermission(route) && route !== 'customer-portal') {
+    if (route !== 'login' && route !== 'landing' && !auth.hasPermission(route) && route !== 'customer-portal') {
       console.warn(`Role ${currentRole} does not have access to route: ${route}`);
       // Fallback to first allowed route
       route = currentRole === 'CUSTOMER' ? 'customer-portal' : 'dashboard';
@@ -112,7 +126,7 @@ class AppController {
     const headerContainer = document.getElementById('app-header-slot');
     const sidebarContainer = document.getElementById('app-sidebar-slot');
 
-    if (activeRoute === 'login') {
+    if (activeRoute === 'login' || activeRoute === 'landing') {
       if (headerContainer) headerContainer.style.display = 'none';
       if (sidebarContainer) sidebarContainer.style.display = 'none';
       return;
@@ -138,6 +152,9 @@ class AppController {
     mainContainer.innerHTML = '';
 
     switch (route) {
+      case 'landing':
+        renderLandingPage(mainContainer);
+        break;
       case 'login':
         renderLoginPage(mainContainer);
         break;

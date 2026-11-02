@@ -38,4 +38,10 @@ describe('Static Assets (e2e)', () => {
     expect(res.status).toBe(200);
     expect(res.header['content-type']).toContain('application/javascript');
   });
+
+  it('GET /js/modules/landing.js should serve landing page module', async () => {
+    const res = await request(app.getHttpServer()).get('/js/modules/landing.js');
+    expect(res.status).toBe(200);
+    expect(res.header['content-type']).toContain('application/javascript');
+  });
 });

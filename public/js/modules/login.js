@@ -64,6 +64,12 @@ export function renderLoginPage(container) {
           >
             Masuk ke Sistem
           </button>
+
+          <div style="text-align: center; margin-top: 6px;">
+            <a href="#landing" style="font-size: 0.8rem; color: #15803D; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+              &larr; Kembali ke Halaman Utama
+            </a>
+          </div>
         </form>
 
       </div>
