@@ -29,6 +29,7 @@ import { renderPrograms } from './modules/programs.js';
 import { renderReports } from './modules/reports.js';
 import { renderSystem } from './modules/system.js';
 import { renderCustomerPortal } from './modules/customerportal.js';
+import { renderLoginPage } from './modules/login.js';
 
 class AppController {
   constructor() {
@@ -56,9 +57,10 @@ class AppController {
 
     // Role Switcher / Auth Changed Listener
     window.addEventListener('app:auth-changed', (e) => {
-      console.log('Role switched to:', e.detail.role);
-      // If Customer, default to customer-portal
-      if (e.detail.role === 'CUSTOMER') {
+      console.log('Role/auth changed to:', e.detail?.role);
+      if (!e.detail?.user) {
+        window.location.hash = '#login';
+      } else if (e.detail.role === 'CUSTOMER') {
         window.location.hash = '#customer-portal';
       } else {
         window.location.hash = '#dashboard';
@@ -75,17 +77,30 @@ class AppController {
   handleRoute() {
     let route = window.location.hash.replace('#', '').trim() || 'dashboard';
 
-    // Route permissions check
+    // Route permissions & auth check
+    if (!auth.isAuthenticated()) {
+      route = 'login';
+      if (window.location.hash !== '#login') {
+        window.location.hash = '#login';
+        return;
+      }
+    } else if (route === 'login') {
+      route = auth.getRole() === 'CUSTOMER' ? 'customer-portal' : 'dashboard';
+      window.location.hash = `#${route}`;
+      return;
+    }
+
     const currentRole = auth.getRole();
     if (currentRole === 'CUSTOMER' && route === 'dashboard') {
       route = 'customer-portal';
     }
 
-    if (!auth.hasPermission(route) && route !== 'customer-portal') {
+    if (route !== 'login' && !auth.hasPermission(route) && route !== 'customer-portal') {
       console.warn(`Role ${currentRole} does not have access to route: ${route}`);
       // Fallback to first allowed route
       route = currentRole === 'CUSTOMER' ? 'customer-portal' : 'dashboard';
       window.location.hash = `#${route}`;
+      return;
     }
 
     this.currentRoute = route;
@@ -97,11 +112,19 @@ class AppController {
     const headerContainer = document.getElementById('app-header-slot');
     const sidebarContainer = document.getElementById('app-sidebar-slot');
 
+    if (activeRoute === 'login') {
+      if (headerContainer) headerContainer.style.display = 'none';
+      if (sidebarContainer) sidebarContainer.style.display = 'none';
+      return;
+    }
+
     if (headerContainer) {
+      headerContainer.style.display = '';
       renderHeader(headerContainer);
     }
 
     if (sidebarContainer) {
+      sidebarContainer.style.display = '';
       renderSidebar(sidebarContainer, activeRoute, (targetRoute) => {
         window.location.hash = `#${targetRoute}`;
       });
@@ -115,6 +138,9 @@ class AppController {
     mainContainer.innerHTML = '';
 
     switch (route) {
+      case 'login':
+        renderLoginPage(mainContainer);
+        break;
       case 'dashboard':
         renderDashboard(mainContainer);
         break;

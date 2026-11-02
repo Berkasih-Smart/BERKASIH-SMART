@@ -23,6 +23,12 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   partner_id?: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  password_hash?: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  salt?: string;
+
   @Column({ type: 'varchar', default: 'ACTIVE' })
   status: string;
 

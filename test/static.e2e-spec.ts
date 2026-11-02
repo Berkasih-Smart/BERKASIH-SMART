@@ -32,4 +32,10 @@ describe('Static Assets (e2e)', () => {
     expect(res.status).toBe(200);
     expect(res.header['content-type']).toContain('application/javascript');
   });
+
+  it('GET /js/modules/login.js should serve login module', async () => {
+    const res = await request(app.getHttpServer()).get('/js/modules/login.js');
+    expect(res.status).toBe(200);
+    expect(res.header['content-type']).toContain('application/javascript');
+  });
 });

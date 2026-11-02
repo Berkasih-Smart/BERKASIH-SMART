@@ -2,6 +2,7 @@ import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as path from 'path';
 import * as fs from 'fs';
+import { hashPassword } from '../modules/auth/auth.utils';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -59,7 +60,13 @@ export class SeedService implements OnApplicationBootstrap {
       }
 
       // Insert entities
-      if (initialData.users?.length) await manager.getRepository('User').save(initialData.users);
+      if (initialData.users?.length) {
+        const usersWithPasswords = initialData.users.map((u: any) => {
+          const { hash, salt } = hashPassword('password123');
+          return { ...u, password_hash: hash, salt };
+        });
+        await manager.getRepository('User').save(usersWithPasswords);
+      }
       if (initialData.rw?.length) await manager.getRepository('RW').save(initialData.rw);
       if (initialData.service_points?.length) await manager.getRepository('ServicePoint').save(initialData.service_points);
       if (initialData.waste_types?.length) await manager.getRepository('WasteType').save(initialData.waste_types);

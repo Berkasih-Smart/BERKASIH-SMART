@@ -66,28 +66,31 @@ class AuthService {
   loadSession() {
     try {
       const stored = localStorage.getItem(AUTH_KEY);
-      if (stored) {
+      const token = localStorage.getItem('smart_waste_token');
+      if (stored && token) {
         return JSON.parse(stored);
       }
     } catch (e) {
       console.warn('Failed to load session:', e);
     }
-
-    // Default to Super Admin (Hendra Gunawan) for rich evaluation experience
-    const defaultUser = db.getUsers().find(u => u.role === 'SUPER_ADMIN') || {
-      id: 'usr-01',
-      name: 'Hendra Gunawan, S.T.',
-      email: 'hendra@berkasih.id',
-      role: 'SUPER_ADMIN'
-    };
-    this.saveSession(defaultUser);
-    return defaultUser;
+    return null;
   }
 
-  saveSession(user) {
+  isAuthenticated() {
+    return Boolean(this.currentUser && localStorage.getItem('smart_waste_token'));
+  }
+
+  saveSession(user, token) {
     this.currentUser = user;
     try {
-      localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+      if (user) {
+        localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+      } else {
+        localStorage.removeItem(AUTH_KEY);
+      }
+      if (token) {
+        localStorage.setItem('smart_waste_token', token);
+      }
     } catch (e) {
       console.error('Failed to save session:', e);
     }
@@ -98,19 +101,99 @@ class AuthService {
   }
 
   getRole() {
-    return this.currentUser?.role || 'SUPER_ADMIN';
+    return this.currentUser?.role || null;
   }
 
   hasPermission(route) {
+    if (!this.isAuthenticated()) return false;
     const role = this.getRole();
     const permissions = ROLE_PERMISSIONS[role]?.allowedRoutes || [];
     return permissions.includes(route);
   }
 
+  isImpersonating() {
+    return Boolean(localStorage.getItem('smart_waste_impersonator'));
+  }
+
+  isSuperAdmin() {
+    if (this.currentUser?.role === 'SUPER_ADMIN') return true;
+    const original = this.getOriginalUser();
+    return original?.role === 'SUPER_ADMIN';
+  }
+
+  getOriginalUser() {
+    try {
+      const stored = localStorage.getItem('smart_waste_impersonator');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  impersonate(roleName) {
+    if (!this.isSuperAdmin()) return;
+
+    if (!this.isImpersonating()) {
+      localStorage.setItem('smart_waste_impersonator', JSON.stringify(this.currentUser));
+    }
+
+    const targetUser = db.getUsers().find(u => u.role === roleName) || {
+      id: `usr-demo-${roleName.toLowerCase()}`,
+      name: `Pengguna Demo (${ROLE_PERMISSIONS[roleName]?.name || roleName})`,
+      email: `demo.${roleName.toLowerCase()}@berkasih.id`,
+      role: roleName
+    };
+
+    this.currentUser = targetUser;
+    localStorage.setItem(AUTH_KEY, JSON.stringify(targetUser));
+
+    db.logAudit(
+      this.currentUser,
+      'IMPERSONATE_ROLE',
+      'SESSION',
+      targetUser.id,
+      'Super Admin simulation',
+      `Simulating Role: ${roleName}`
+    );
+
+    const event = new CustomEvent('app:auth-changed', {
+      detail: { user: targetUser, role: roleName }
+    });
+    window.dispatchEvent(event);
+  }
+
+  stopImpersonating() {
+    const original = this.getOriginalUser();
+    if (!original) return;
+
+    localStorage.removeItem('smart_waste_impersonator');
+    this.currentUser = original;
+    localStorage.setItem(AUTH_KEY, JSON.stringify(original));
+
+    db.logAudit(
+      original,
+      'STOP_IMPERSONATE',
+      'SESSION',
+      original.id,
+      'Returned to Super Admin',
+      'Active Role: SUPER_ADMIN'
+    );
+
+    const event = new CustomEvent('app:auth-changed', {
+      detail: { user: original, role: 'SUPER_ADMIN' }
+    });
+    window.dispatchEvent(event);
+  }
+
   switchRole(roleName) {
+    if (this.isSuperAdmin()) {
+      this.impersonate(roleName);
+      return;
+    }
+
     const user = db.getUsers().find(u => u.role === roleName);
     if (user) {
-      this.saveSession(user);
+      this.saveSession(user, 'dummy-demo-token');
     } else {
       // Fallback object
       this.saveSession({
@@ -118,7 +201,7 @@ class AuthService {
         name: `Pengguna Demo (${ROLE_PERMISSIONS[roleName]?.name || roleName})`,
         email: `demo.${roleName.toLowerCase()}@berkasih.id`,
         role: roleName
-      });
+      }, 'dummy-demo-token');
     }
 
     db.logAudit(
@@ -136,25 +219,63 @@ class AuthService {
     window.dispatchEvent(event);
   }
 
-  login(email, password, remember = false) {
-    const user = db.getUsers().find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (!user) {
-      throw new Error('Alamat email atau akun tidak terdaftar di sistem BERKASIH SMART.');
-    }
-    // Demo accepts any password > 3 chars
-    if (!password || password.length < 4) {
-      throw new Error('Kata sandi harus minimal 4 karakter.');
-    }
+  getToken() {
+    return localStorage.getItem('smart_waste_token') || '';
+  }
 
-    this.saveSession(user);
-    db.logAudit(user, 'USER_LOGIN', 'SESSION', user.id, 'Logged out', 'Logged in via form');
-    return user;
+  async login(email, password, remember = false) {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || 'Alamat email atau kata sandi tidak valid.');
+      }
+
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem('smart_waste_token', data.token);
+      }
+      this.saveSession(data.user);
+
+      const event = new CustomEvent('app:auth-changed', {
+        detail: { user: data.user, role: data.user.role }
+      });
+      window.dispatchEvent(event);
+
+      return data.user;
+    } catch (e) {
+      // If offline or network error, fallback to demo local check
+      const user = db.getUsers().find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (!user) {
+        throw new Error(e.message || 'Alamat email atau akun tidak terdaftar di sistem BERKASIH SMART.');
+      }
+      this.saveSession(user);
+      const event = new CustomEvent('app:auth-changed', {
+        detail: { user, role: user.role }
+      });
+      window.dispatchEvent(event);
+      return user;
+    }
   }
 
   logout() {
-    db.logAudit(this.currentUser, 'USER_LOGOUT', 'SESSION', this.currentUser?.id, 'Active', 'Logged out');
-    // Re-default to super admin or redirect to login
-    this.switchRole('SUPER_ADMIN');
+    const prev = this.currentUser;
+    localStorage.removeItem(AUTH_KEY);
+    localStorage.removeItem('smart_waste_token');
+    localStorage.removeItem('smart_waste_impersonator');
+    this.currentUser = null;
+    if (prev) {
+      db.logAudit(prev, 'USER_LOGOUT', 'SESSION', prev?.id, 'Active', 'Logged out');
+    }
+    const event = new CustomEvent('app:auth-changed', {
+      detail: { user: null, role: null }
+    });
+    window.dispatchEvent(event);
   }
 }
 
