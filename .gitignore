@@ -15,3 +15,15 @@ Desktop.ini
 # Temporary / Log files
 *.log
 *.tmp
+
+# Node / Dependencies / Build
+node_modules/
+dist/
+
+# SQLite Database
+*.sqlite
+*.sqlite-journal
+
+# Superpowers scratchpad
+.superpowers/
+
