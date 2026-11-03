@@ -44,4 +44,17 @@ describe('Static Assets (e2e)', () => {
     expect(res.status).toBe(200);
     expect(res.header['content-type']).toContain('application/javascript');
   });
+
+  it('GET /privacy should serve privacy policy page', async () => {
+    const res = await request(app.getHttpServer()).get('/privacy');
+    expect(res.status).toBe(200);
+    expect(res.text).toContain('Kebijakan Privasi (Privacy Policy)');
+    expect(res.text).toContain('UIN Siber Syekh Nurjati Cirebon');
+  });
+
+  it('GET /privacy/ should serve privacy policy page', async () => {
+    const res = await request(app.getHttpServer()).get('/privacy/');
+    expect(res.status).toBe(200);
+    expect(res.text).toContain('Kebijakan Privasi (Privacy Policy)');
+  });
 });

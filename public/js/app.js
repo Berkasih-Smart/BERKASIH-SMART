@@ -77,6 +77,10 @@ class AppController {
 
   handleRoute() {
     let rawHash = window.location.hash.replace('#', '').trim();
+    if (rawHash === 'privacy') {
+      window.location.href = '/privacy';
+      return;
+    }
     const landingAnchors = ['katalog-harga', 'kalkulator', 'dampak', 'cara-kerja', 'jadwal'];
     if (landingAnchors.includes(rawHash)) {
       if (this.currentRoute === 'landing') {
