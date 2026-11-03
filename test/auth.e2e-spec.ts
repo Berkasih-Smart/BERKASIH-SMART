@@ -73,6 +73,53 @@ describe('Auth Module (e2e)', () => {
     expect(meRes.body.user.role).toBe('MANAGER');
   });
 
+  it('GET /api/auth/me - accepts standard 3-part JWT with seconds exp', async () => {
+    const crypto = await import('crypto');
+    const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+    const payload = Buffer.from(
+      JSON.stringify({
+        sub: 'usr-01',
+        email: 'hendra@berkasih.id',
+        role: 'SUPER_ADMIN',
+        exp: Math.floor(Date.now() / 1000) + 3600, // standard exp in seconds
+      }),
+    ).toString('base64url');
+    const sig = crypto
+      .createHmac('sha256', process.env.JWT_SECRET || 'smart-waste-secret-key-2026')
+      .update(`${header}.${payload}`)
+      .digest('base64url');
+    const standardJwt = `${header}.${payload}.${sig}`;
+
+    const res = await request(app.getHttpServer())
+      .get('/api/auth/me')
+      .set('Authorization', `Bearer ${standardJwt}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.user.email).toBe('hendra@berkasih.id');
+  });
+
+  it('GET /api/auth/me - rejects truly expired token', async () => {
+    const crypto = await import('crypto');
+    const payload = Buffer.from(
+      JSON.stringify({
+        sub: 'USR-001',
+        exp: Date.now() - 5000, // expired 5 seconds ago
+      }),
+    ).toString('base64url');
+    const sig = crypto
+      .createHmac('sha256', process.env.JWT_SECRET || 'smart-waste-secret-key-2026')
+      .update(payload)
+      .digest('base64url');
+    const expiredToken = `${payload}.${sig}`;
+
+    const res = await request(app.getHttpServer())
+      .get('/api/auth/me')
+      .set('Authorization', `Bearer ${expiredToken}`);
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toContain('Token tidak valid atau telah kedaluwarsa');
+  });
+
   it('GET /api/auth/me - invalid or missing token returns 401', async () => {
     const res = await request(app.getHttpServer())
       .get('/api/auth/me');
